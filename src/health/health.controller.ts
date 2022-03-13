@@ -13,8 +13,7 @@ export class HealthController {
   @HealthCheck()
   check() {
     return this.health.check([
-      () => this.http.pingCheck('nestjs-docs', 'https://docs.nestjs.com'),
-      () => this.http.pingCheck('nestjs-docsD', 'https://docs.nestjs.comD'),
+      () => this.http.pingCheck('microservice', 'http://localhost:3000/status'),
     ]);
   }
 

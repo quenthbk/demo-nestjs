@@ -3,9 +3,9 @@ import { HealthIndicator, HealthIndicatorResult, HealthCheckError } from '@nestj
 import { isAxiosError } from '@nestjs/terminus/dist/utils';
 import axios, { AxiosError, AxiosRequestConfig } from 'axios';
 
-export interface Dog {
-  name: string;
-  type: string;
+export interface StatusHealth {
+  status: string,
+  version: string
 }
 
 @Injectable()
@@ -48,21 +48,24 @@ export class ServiceHealthIndicator extends HealthIndicator {
    */
    async pingCheck(
     key: string,
-    url: string,
-    options?: AxiosRequestConfig,
+    url: string
   ): Promise<HealthIndicatorResult> {
     let isHealthy = false;
-    // In case the user has a preconfigured HttpService (see `HttpModule.register`)
-    // we just let him/her pass in this HttpService so that he/she does not need to
-    // reconfigure it.
-    // https://github.com/nestjs/terminus/issues/1151
+
     const httpService = axios;
-    let data = {}
+    let data: StatusHealth | any = {}
     try {
-      data = (await httpService.request({ url, ...options })).data;
+      data = (await httpService.request<StatusHealth>({
+        url,
+      })).data;
       isHealthy = true;
     } catch (err) {
       this.generateHttpError(key, err);
+    }
+
+    // Avoid receiving all the data from a website
+    if (! (data.version || data.status)) {
+      data = {}
     }
 
     return this.getStatus(key, isHealthy, data);
