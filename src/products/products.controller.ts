@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Param, Post } from '@nestjs/common';
+import { Body, Controller, Get, Param, ParseIntPipe, Post } from '@nestjs/common';
 import { GetProductDTO } from './products.dto';
 import { ProductService } from './products.service';
 
@@ -7,7 +7,7 @@ export class ProductController {
   constructor(private readonly service: ProductService) {}
 
   @Get(':id')
-  async getById(@Param('id') id: number) {
+  async getById(@Param('id', ParseIntPipe) id: number) {
     return await this.service.findOne(id)
   }
 
